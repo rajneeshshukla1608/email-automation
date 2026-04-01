@@ -61,27 +61,30 @@ app.post("/webhook", async (req, res) => {
   try {
     const data = req.body;
 
-    const name = data.name || "";
-    const email = data.email || "";
-    
-    // Safely get first experience if available
-    const firstExp = (data.experience && data.experience[0]) || {};
-    const title = firstExp.position || "";
-    const company = firstExp.company || "";
+    // Make sure data is an array (SignalHire sends array of candidates)
+    const candidateData = data[0]?.candidate || {};
+    if (!candidateData) {
+      console.log("No candidate data found in webhook.");
+      return res.sendStatus(200);
+    }
 
-  await sheets.spreadsheets.values.append({
+    const row = [
+      candidateData.fullName || "",
+      candidateData.photo?.url || "",
+      candidateData.locations?.map(l => l.name).join(", ") || "",
+      candidateData.skills?.join(", ") || "",
+      candidateData.education?.map(e => e.university).join(", ") || "",
+      "NEW"
+    ];
+
+    await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: "'Rishabh Email Trigger'!A:E", // ✅ wrap sheet name in quotes
+      range: `'${SHEET_NAME}'!A:F`,
       valueInputOption: "RAW",
-      requestBody: {
-        values: [[name || "", email || "", title || "", company || "", "NEW"]]
-      }
+      requestBody: { values: [row] }
     });
-    console.log("Name:", name);
-    console.log("Email:", email);
-    console.log("Title:", title);
-    console.log("Company:", company);
-    console.log(`✅ Added to sheet: ${name}, ${email}, ${title}, ${company}`);
+
+    console.log(`✅ Added to sheet: ${row.join(" | ")}`);
     res.sendStatus(200);
   } catch (error) {
     console.error("❌ Error writing to sheet:", error);
