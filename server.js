@@ -56,28 +56,35 @@ app.post("/lookup", async (req, res) => {
 // Webhook to receive SignalHire enriched data
 // ============================
 app.post("/webhook", async (req, res) => {
-  console.log("📬 Webhook received:", req.body);
+  console.log("📬 Webhook received payload:", JSON.stringify(req.body, null, 2));
 
   try {
-    const { name, email, title, company } = req.body;
+    // Extract data safely
+    const data = req.body?.[0]?.data || req.body; // handle if SignalHire sends array or object
+    const name = data?.name || "";
+    const email = data?.contacts?.find(c => c.type === "email")?.value || "";
+    const title = data?.experience?.[0]?.title || "";
+    const company = data?.experience?.[0]?.company || "";
 
+    console.log("Parsed values:", { name, email, title, company });
+
+    // Append to Google Sheet (specifying range with !A:E)
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: SHEET_NAME, // just the sheet name
+      range: `${SHEET_NAME}!A:E`,
       valueInputOption: "RAW",
       requestBody: {
-        values: [[name || "", email || "", title || "", company || "", "NEW"]]
+        values: [[name, email, title, company, "NEW"]]
       }
     });
 
-    console.log(`✅ Added to sheet: ${name}, ${email}`);
+    console.log(`✅ Successfully added to sheet: ${name}, ${email}`);
     res.sendStatus(200);
   } catch (error) {
-    console.error("❌ Error writing to sheet:", error);
-    res.sendStatus(500);
+    console.error("❌ Error writing to sheet:", error.response?.data || error.message || error);
+    res.status(500).json({ error: error.message || "Unknown server error" });
   }
 });
-
 // ============================
 // Start server
 // ============================
