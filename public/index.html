@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SignalHire Mini App</title>
+</head>
+<body>
+  <h2>SignalHire Lookup</h2>
+  <input id="linkedin" placeholder="Paste LinkedIn URL" size="50" />
+  <input id="apikey" placeholder="SignalHire API Key" size="50" />
+  <button onclick="lookup()">Lookup</button>
+
+  <p id="status"></p>
+
+  <script>
+    async function lookup() {
+      const url = document.getElementById("linkedin").value;
+      const apiKey = document.getElementById("apikey").value;
+
+      const response = await fetch("/lookup", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ linkedinUrl: url, apiKey })
+      });
+
+      const data = await response.json();
+      document.getElementById("status").innerText = data.status || data.error;
+    }
+  </script>
+</body>
+</html>
