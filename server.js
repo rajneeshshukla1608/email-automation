@@ -70,13 +70,13 @@ app.post("/webhook", async (req, res) => {
 
     // Append to Google Sheet (specifying range with !A:E)
     await sheets.spreadsheets.values.append({
-      spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:E`,
-      valueInputOption: "RAW",
-      requestBody: {
-        values: [[name, email, title, company, "NEW"]]
-      }
-    });
+    spreadsheetId: SPREADSHEET_ID,
+    range: `${SHEET_NAME}!A:E`,
+    valueInputOption: "RAW",
+    requestBody: {
+      values: [[name || "", email || "", title || "", company || "", "NEW"]]
+    }
+  });
 
     console.log(`✅ Successfully added to sheet: ${name}, ${email}`);
     res.sendStatus(200);
