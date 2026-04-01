@@ -8,6 +8,8 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static("public"));
 
+const SIGNALHIRE_API_KEY = process.env.SIGNALHIRE_API_KEY;
+
 // Google Sheet setup
 const SPREADSHEET_ID = "18Wo8xZj0kFgEr0DVoBhIT5DSWB2qWIpwq98ZlXJjsCw";
 const SHEET_NAME = "Rishabh Email Trigger";
