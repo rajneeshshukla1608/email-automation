@@ -56,30 +56,24 @@ app.post("/lookup", async (req, res) => {
 // Webhook to receive SignalHire enriched data
 // ============================
 app.post("/webhook", async (req, res) => {
+  console.log("📬 Webhook received:", req.body);
+
   try {
-    console.log("Webhook received:", JSON.stringify(req.body, null, 2));
+    const { name, email, title, company } = req.body;
 
-    // SignalHire may wrap candidate data under "candidate"
-    const candidate = req.body.candidate || req.body;
-    const name = candidate.name || "";
-    const email = candidate.email || "";
-    const role = candidate.title || "";       // maps to your 'role' column
-    const company = candidate.company || "";
-
-    // Append row to Google Sheet
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:E`,
-      valueInputOption: "USER_ENTERED",
+      range: SHEET_NAME, // just the sheet name
+      valueInputOption: "RAW",
       requestBody: {
-        values: [[name, email, role, company, "NEW"]]
+        values: [[name || "", email || "", title || "", company || "", "NEW"]]
       }
     });
 
-    console.log(`✅ Added row: ${name}, ${email}, ${role}, ${company}`);
+    console.log(`✅ Added to sheet: ${name}, ${email}`);
     res.sendStatus(200);
   } catch (error) {
-    console.error("Error writing to sheet:", error);
+    console.error("❌ Error writing to sheet:", error);
     res.sendStatus(500);
   }
 });
