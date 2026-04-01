@@ -69,15 +69,18 @@ app.post("/webhook", async (req, res) => {
     const title = firstExp.position || "";
     const company = firstExp.company || "";
 
-    await sheets.spreadsheets.values.append({
+  await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:E`, // fixed range
+      range: "'Rishabh Email Trigger'!A:E", // ✅ wrap sheet name in quotes
       valueInputOption: "RAW",
       requestBody: {
-        values: [[name, email, title, company, "NEW"]]
+        values: [[name || "", email || "", title || "", company || "", "NEW"]]
       }
     });
-
+    console.log("Name:", name);
+    console.log("Email:", email);
+    console.log("Title:", title);
+    console.log("Company:", company);
     console.log(`✅ Added to sheet: ${name}, ${email}, ${title}, ${company}`);
     res.sendStatus(200);
   } catch (error) {
