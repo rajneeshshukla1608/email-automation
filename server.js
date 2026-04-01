@@ -22,16 +22,15 @@ const sheets = google.sheets({ version: "v4", auth });
 // Endpoint to receive LinkedIn URL from mini app
 app.post("/lookup", async (req, res) => {
   try {
-    const { linkedinUrl, apiKey } = req.body;
+    const { linkedinUrl } = req.body; // only URL now
 
-    // Call SignalHire API
-    const response = await axios.post("https://www.signalhire.com/api/v1/candidate/search", {
-      api_key: apiKey,
+    // Call SignalHire API using stored API Key
+    await axios.post("https://www.signalhire.com/api/v1/candidate/search", {
+      api_key: SIGNALHIRE_API_KEY,
       profiles: [linkedinUrl],
-      callback_url: "http://localhost:3000/webhook"  // temporarily local
+      callback_url: "https://your-mini-app.up.railway.app/webhook" // your live webhook
     });
 
-    // The real data will come via webhook; we just return status here
     res.json({ status: "Lookup triggered. Data will arrive in Google Sheet via webhook." });
 
   } catch (error) {
