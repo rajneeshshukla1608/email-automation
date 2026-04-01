@@ -13,7 +13,7 @@ const SIGNALHIRE_API_KEY = process.env.SIGNALHIRE_API_KEY;
 
 // Google Sheet setup
 const SPREADSHEET_ID = "18Wo8xZj0kFgEr0DVoBhIT5DSWB2qWIpwq98ZlXJjsCw";
-const SHEET_NAME = "Rishabh Email Trigger";
+const SHEET_NAME = "email";
 
 const auth = new google.auth.GoogleAuth({
   credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
