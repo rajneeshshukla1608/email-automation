@@ -11,19 +11,18 @@
   <p id="status"></p>
 
   <script>
-    async function lookup() {
-      const url = document.getElementById("linkedin").value;
-      const apiKey = document.getElementById("apikey").value;
+   async function lookup() {
+  const url = document.getElementById("linkedin").value;
 
-      const response = await fetch("/lookup", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ linkedinUrl: url, apiKey })
-      });
+  const response = await fetch("/lookup", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ linkedinUrl: url }) // only URL
+  });
 
-      const data = await response.json();
-      document.getElementById("status").innerText = data.status || data.error;
-    }
+  const data = await response.json();
+  document.getElementById("status").innerText = data.status || data.error;
+}
   </script>
 </body>
 </html>
