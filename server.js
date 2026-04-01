@@ -56,33 +56,33 @@ app.post("/lookup", async (req, res) => {
 // Webhook to receive SignalHire enriched data
 // ============================
 app.post("/webhook", async (req, res) => {
-  console.log("📬 Webhook received payload:", JSON.stringify(req.body, null, 2));
+  console.log("📬 Webhook received:", JSON.stringify(req.body, null, 2));
 
   try {
-    // Extract data safely
-    const data = req.body?.[0]?.data || req.body; // handle if SignalHire sends array or object
-    const name = data?.name || "";
-    const email = data?.contacts?.find(c => c.type === "email")?.value || "";
-    const title = data?.experience?.[0]?.title || "";
-    const company = data?.experience?.[0]?.company || "";
+    const data = req.body;
 
-    console.log("Parsed values:", { name, email, title, company });
+    const name = data.name || "";
+    const email = data.email || "";
+    
+    // Safely get first experience if available
+    const firstExp = (data.experience && data.experience[0]) || {};
+    const title = firstExp.position || "";
+    const company = firstExp.company || "";
 
-    // Append to Google Sheet (specifying range with !A:E)
     await sheets.spreadsheets.values.append({
-    spreadsheetId: SPREADSHEET_ID,
-    range: `${SHEET_NAME}!A:E`,
-    valueInputOption: "RAW",
-    requestBody: {
-      values: [[name || "", email || "", title || "", company || "", "NEW"]]
-    }
-  });
+      spreadsheetId: SPREADSHEET_ID,
+      range: `${SHEET_NAME}!A:E`, // fixed range
+      valueInputOption: "RAW",
+      requestBody: {
+        values: [[name, email, title, company, "NEW"]]
+      }
+    });
 
-    console.log(`✅ Successfully added to sheet: ${name}, ${email}`);
+    console.log(`✅ Added to sheet: ${name}, ${email}, ${title}, ${company}`);
     res.sendStatus(200);
   } catch (error) {
-    console.error("❌ Error writing to sheet:", error.response?.data || error.message || error);
-    res.status(500).json({ error: error.message || "Unknown server error" });
+    console.error("❌ Error writing to sheet:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 // ============================
