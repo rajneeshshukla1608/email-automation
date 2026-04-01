@@ -9,8 +9,8 @@ app.use(bodyParser.json());
 app.use(express.static("public"));
 
 // Google Sheet setup
-const SPREADSHEET_ID = "YOUR_SHEET_ID";
-const SHEET_NAME = "Sheet1";
+const SPREADSHEET_ID = "18Wo8xZj0kFgEr0DVoBhIT5DSWB2qWIpwq98ZlXJjsCw";
+const SHEET_NAME = "Rishabh Email Trigger";
 
 const auth = new google.auth.GoogleAuth({
   keyFile: "service-account.json",
@@ -28,7 +28,7 @@ app.post("/lookup", async (req, res) => {
     await axios.post("https://www.signalhire.com/api/v1/candidate/search", {
       api_key: SIGNALHIRE_API_KEY,
       profiles: [linkedinUrl],
-      callback_url: "https://your-mini-app.up.railway.app/webhook" // your live webhook
+      callback_url: "https://email-automation-production-82fd.up.railway.app/webhook"
     });
 
     res.json({ status: "Lookup triggered. Data will arrive in Google Sheet via webhook." });
