@@ -16,10 +16,9 @@ const SPREADSHEET_ID = "18Wo8xZj0kFgEr0DVoBhIT5DSWB2qWIpwq98ZlXJjsCw";
 const SHEET_NAME = "Rishabh Email Trigger";
 
 const auth = new google.auth.GoogleAuth({
-  keyFile: "service-account.json", // ensure this file is uploaded in Railway
+  credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
   scopes: ["https://www.googleapis.com/auth/spreadsheets"]
 });
-
 const sheets = google.sheets({ version: "v4", auth });
 
 // ============================
