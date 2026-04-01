@@ -33,12 +33,18 @@ app.post("/lookup", async (req, res) => {
     }
 
     // Call SignalHire API with stored API key and your webhook URL
-    await axios.post("https://www.signalhire.com/api/v1/candidate/search", {
-      api_key: SIGNALHIRE_API_KEY,
-      profiles: [linkedinUrl],
-      callback_url: "https://email-automation-production-82fd.up.railway.app/webhook"
-    });
-
+    await axios.post(
+      "https://www.signalhire.com/api/v1/candidate/search",
+      {
+        items: [linkedinUrl],
+        callbackUrl: "https://email-automation-production-82fd.up.railway.app/webhook"
+      },
+      {
+        headers: {
+          apikey: SIGNALHIRE_API_KEY
+        }
+      }
+    );
     res.json({ status: "Lookup triggered. Data will arrive in Google Sheet via webhook." });
   } catch (error) {
     console.error(error.response?.data || error.message);
